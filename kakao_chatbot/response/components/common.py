@@ -17,7 +17,7 @@ classes:
 """
 
 from abc import ABCMeta
-from typing import Optional
+from typing import Optional, Union, List, Dict
 
 
 from ...customerror import InvalidLinkError
@@ -95,7 +95,7 @@ class Link(Common):
             raise InvalidLinkError("Link는 최소 하나의 링크를 가져야 합니다.")
         validate_str(self.web, self.pc, self.mobile)
 
-    def render(self) -> dict:
+    def render(self) -> Dict:
         """Link 객체를 카카오톡 응답 형식에 맞게 딕셔너리로 변환합니다.
 
         response에 web, pc, mobile 링크를 저장합니다.
@@ -154,7 +154,7 @@ class Thumbnail(Common):
         validate_type(Link, self.link, disallow_none=False)
         validate_type(bool, self.fixed_ratio)
 
-    def render(self) -> dict:
+    def render(self) -> Dict:
         """Thumbnail 객체를 카카오톡 응답 형식에 맞게 딕셔너리로 변환합니다.
 
         response에 image_url, fixed_ratio, link를 저장합니다.
@@ -253,23 +253,23 @@ class Button(Interaction, Common):
         {'label': '버튼 1', 'action': 'message', 'messageText': '버튼 1 클릭'}
     """
 
-    available_action_enums: list[ActionEnum] = [action for action in ActionEnum]
+    available_action_enums: List[ActionEnum] = [action for action in ActionEnum]
 
     def __init__(
         self,
         label: str,
-        action: str | ActionEnum,
+        action: Union[str, ActionEnum],
         web_link_url: Optional[str] = None,
         message_text: Optional[str] = None,
         phone_number: Optional[str] = None,
         block_id: Optional[str] = None,
-        extra: Optional[dict] = None,
+        extra: Optional[Dict] = None,
     ):
         """Button 클래스의 생성자 메서드입니다.
 
         Args:
             label (str): 버튼에 적히는 문구입니다.
-            action (str | Action): 버튼 클릭시 수행될 작업입니다.
+            action Union[str, Action]: 버튼 클릭시 수행될 작업입니다.
                                     (webLink, message, phone,
                                     block, share, operator)
             web_link_url (Optional[str]): 웹 브라우저를 열고 이동할 주소입니다.
@@ -312,7 +312,7 @@ class Button(Interaction, Common):
         )
         super().validate()
 
-    def render(self) -> dict:
+    def render(self) -> Dict:
         """Button 객체를 카카오톡 응답 형식에 맞게 딕셔너리로 변환합니다.
 
         Examples:
@@ -351,7 +351,7 @@ class ListItem(Common, Interaction):
         description (str, optional): items에 들어가는 경우, 해당 항목의 설명
         image_url (str, optional): items에 들어가는 경우, 해당 항목의 우측 안내 사진
         link (Link, optional): 리스트 아이템 클릭 시 동작할 링크
-        action (str | Action, optional): 리스트 아이템 클릭시 수행될 작업(block 또는 message)
+        action (Union[str, Action], optional): 리스트 아이템 클릭시 수행될 작업(block 또는 message)
         block_id (str, optional): action이 block인 경우 block_id를 갖는 블록을 호출
         message_text (str, optional): action이 message인 경우 리스트 아이템 클릭 시 전달할 메시지
         extra (dict, optional): 블록 호출시, 스킬 서버에 추가적으로 제공하는 정보
@@ -365,10 +365,10 @@ class ListItem(Common, Interaction):
         description: Optional[str] = None,
         image_url: Optional[str] = None,
         link: Optional[Link] = None,
-        action: Optional[str | ActionEnum] = None,
+        action: Optional[Union[str, ActionEnum]] = None,
         block_id: Optional[str] = None,
         message_text: Optional[str] = None,
-        extra: Optional[dict] = None,
+        extra: Optional[Dict] = None,
     ):
         """ListItem 클래스의 생성자 메서드입니다.
 
@@ -377,7 +377,7 @@ class ListItem(Common, Interaction):
             description (str, optional): items에 들어가는 경우, 해당 항목의 설명
             image_url (str, optional): items에 들어가는 경우, 해당 항목의 우측 안내 사진
             link (Link, optional): 리스트 아이템 클릭 시 동작할 링크
-            action (str | Action, optional): 아이템 클릭시 수행될 작업(block 또는 message)
+            action (Union[str, Action], optional): 아이템 클릭시 수행될 작업(block 또는 message)
             block_id (str, optional): action이 block인 경우 block_id를 갖는 블록을 호출
             message_text (str, optional): message인 경우 리스트 아이템 클릭 시 전달할 메시지
             extra (dict, optional): 블록 호출시, 스킬 서버에 추가적으로 제공하는 정보

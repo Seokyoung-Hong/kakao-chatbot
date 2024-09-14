@@ -12,7 +12,7 @@ classes:
     - ItemProfile: ItemCard의 프로필을 담는 클래스
 """
 
-from typing import Optional
+from typing import Optional, Dict
 
 from .common import Common, Link
 from ...validation import validate_str, validate_int
@@ -132,7 +132,7 @@ class ImageTitle(Common):
         validate_str(self.title, disallow_none=True)
         validate_str(self.description)
 
-    def render(self) -> dict:
+    def render(self) -> Dict:
         """ImageTitle을 렌더링합니다.
 
         Returns:
@@ -187,7 +187,7 @@ class Item(Common):
         """
         validate_str(self.title, self.description, disallow_none=True)
 
-    def render(self) -> dict:
+    def render(self) -> Dict:
         """Item을 렌더링합니다.
 
         Returns:
@@ -257,7 +257,7 @@ class ItemProfile(Common):
         validate_str(self.image_url)
         validate_int(self.width, self.height)
 
-    def render(self) -> dict:
+    def render(self) -> Dict:
         """ItemProfile을 렌더링합니다.
 
         Returns:

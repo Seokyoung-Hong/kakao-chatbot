@@ -11,7 +11,7 @@ Classes:
 """
 
 from abc import ABCMeta, abstractmethod
-from typing import Optional, overload
+from typing import Optional, overload, Union, List, Dict
 
 
 from ..base import ParentComponent
@@ -41,7 +41,7 @@ class ParentCardComponent(ParentComponent, metaclass=ABCMeta):
         buttons (list[Button], optional): 버튼 객체입니다.
     """
 
-    def __init__(self, buttons: Optional[list[Button]] = None):
+    def __init__(self, buttons: Optional[List[Button]] = None):
         """ParentCard 객체를 생성합니다.
 
         buttons가 None인 경우 빈 리스트로 초기화합니다.
@@ -69,6 +69,36 @@ class ParentCardComponent(ParentComponent, metaclass=ABCMeta):
 
     @overload
     def add_button(
+            self,
+            label: str,
+            action: Union[str, ActionEnum],
+            web_link_url: Optional[str] = None,
+            message_text: Optional[str] = None,
+            phone_number: Optional[str] = None,
+            block_id: Optional[str] = None,
+            extra: Optional[Dict] = None) -> "ParentCardComponent":
+        """버튼 생성 인자로 버튼을 추가합니다.
+
+        버튼 생성 인자를 받아 Button 객체를 생성하여 버튼 리스트에 추가합니다.
+
+        Args:
+            label (str): 버튼에 적히는 문구입니다.
+            action Union[str, Action]: 버튼 클릭시 수행될 작업입니다.
+                                    (webLink, message, phone,
+                                    block, share, operator)
+            web_link_url (Optional[str]): 웹 브라우저를 열고 이동할 주소입니다.
+                                            (action이 webLink일 경우 필수)
+            message_text (Optional[str]): action이 message인 경우 사용자의 발화로
+                                            messageText를 내보냅니다. (이 경우 필수)
+                                        action이 block인 경우 블록 연결시
+                                            사용자의 발화로 노출됩니다. (이 경우 필수)
+            phone_number (Optional[str]): 전화번호 (action이 phone일 경우 필수)
+            block_id (Optional[str]): 호출할 block_id. (action이 block일 경우 필수)
+            extra (Optional[dict]): 스킬 서버에 추가로 전달할 데이터
+
+        Returns:
+            ParentCard: Button이 추가된 객체
+        """
         self,
         label: str,
         action: str | ActionEnum,
@@ -163,7 +193,7 @@ class TextCardComponent(ParentCardComponent):
         self,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        buttons: Optional[list[Button]] = None,
+        buttons: Optional[List[Button]] = None,
     ):
         """TextCardComponent 객체를 생성합니다.
 
@@ -276,7 +306,7 @@ class BasicCardComponent(ParentCardComponent):
         thumbnail: Thumbnail,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        buttons: Optional[list[Button]] = None,
+        buttons: Optional[List[Button]] = None,
         forwardable: bool = False,
     ):
         """BasicCardComponent 객체를 생성합니다.
@@ -430,10 +460,10 @@ class CommerceCardComponent(ParentCardComponent):
     def __init__(
         self,
         price: int,
-        thumbnails: list[Thumbnail] | Thumbnail,
+        thumbnails: Union[List[Thumbnail], Thumbnail],
         title: Optional[str] = None,
         description: Optional[str] = None,
-        buttons: Optional[list[Button]] = None,
+        buttons: Optional[List[Button]] = None,
         profile: Optional[Profile] = None,
         currency: Optional[str] = None,
         discount: Optional[int] = None,
@@ -477,7 +507,7 @@ class CommerceCardComponent(ParentCardComponent):
         )
         validate_type(Profile, self.profile)
 
-    def render(self) -> dict:
+    def render(self) -> Dict:
         """객체의 응답 내용을 반환합니다.
 
         CommerceCardComponent 객체의 응답 내용을 반환합니다.
@@ -566,16 +596,16 @@ class ListCardComponent(ParentCardComponent):
 
     def __init__(
         self,
-        header: ListItem | str,
-        items: Optional[list[ListItem]] = None,
-        buttons: Optional[list[Button]] = None,
+        header: Union[ListItem, str],
+        items: Optional[List[ListItem]] = None,
+        buttons: Optional[List[Button]] = None,
         max_buttons: int = 2,
         max_items: int = 5,
     ):
         """ListCard 객체를 생성합니다.
 
         Args:
-            header (ListItem | str): 리스트 카드의 상단 항목 str인 경우 ListItem으로 변환됩니다.
+            header Union[ListItem, str]: 리스트 카드의 상단 항목 str인 경우 ListItem으로 변환됩니다.
             items (ListItems): 리스트 카드의 각각 아이템
             buttons (Optional[list[Button]], optional): 리스트 카드의 버튼들.
                                                     Defaults to None.
@@ -646,6 +676,33 @@ class ListCardComponent(ParentCardComponent):
 
     @overload
     def add_item(
+            self,
+            title: str,
+            description: Optional[str] = None,
+            image_url: Optional[str] = None,
+            link: Optional[Link] = None,
+            action: Optional[Union[str, ActionEnum]] = None,
+            block_id: Optional[str] = None,
+            message_text: Optional[str] = None,
+            extra: Optional[Dict] = None
+    ) -> "ListCardComponent":
+        """ListCardComponent에 아이템을 ListItem 생성 인자로 추가합니다.
+
+        Args:
+            title (str): item의 제목
+            description (str, optional): item의 설명
+            image_url (str, optional): item의 우측 안내 사진
+            link (Link, optional): item 클릭 시 동작할 링크
+            action (Union[str, Action], optional):
+                            itaem 클릭 시 수행될 작업(block 또는 message)
+            block_id (str, optional): action이 block인 경우 block_id를 갖는 블록을 호출
+            message_text (str, optional):
+                            action이 message인 경우 리스트 아이템 클릭 시 전달할 메시지
+            extra (dict, optional): 블록 호출시, 스킬 서버에 추가적으로 제공하는 정보
+
+        Returns:
+            ListCardComponent: ListItem이 추가된 객체
+        """
         self,
         title: str,
         description: Optional[str] = None,
@@ -807,7 +864,7 @@ class ItemCardComponent(ParentCardComponent):
 
     def __init__(
         self,
-        item_list: list[Item],
+        item_list: List[Item],
         thumbnail: Optional[ItemThumbnail] = None,
         head: Optional[str] = None,
         profile: Optional[ItemProfile] = None,
@@ -816,7 +873,7 @@ class ItemCardComponent(ParentCardComponent):
         item_list_summary: Optional[ItemListSummary] = None,
         title: Optional[str] = None,
         description: Optional[str] = None,
-        buttons: Optional[list[Button]] = None,
+        buttons: Optional[List[Button]] = None,
         button_layout: Optional[str] = None,
     ):
         """ItemCardComponent 객체를 생성합니다.

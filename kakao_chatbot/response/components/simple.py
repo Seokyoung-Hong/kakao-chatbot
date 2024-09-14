@@ -9,6 +9,9 @@ Classes:
     - SimpleImageComponent: 이미지만을 출력하는 요소를 생성하는 클래스
 """
 
+from typing import List
+
+
 from ...validation import validate_str, validate_type
 from ..base import ParentComponent
 from .card import (
@@ -70,7 +73,7 @@ class CarouselComponent(ParentComponent):
             items (tuple[ParentComponent], optional):
                         CarouselComponent에 포함할 객체 리스트. Defaults to None.
         """
-        self.items: list[ParentComponent] = [*items]
+        self.items: List[ParentComponent] = [*items]
         self.type = None
         if not self.is_empty:
             self.type = type(self.items[0])

@@ -7,6 +7,7 @@ classes:
 """
 
 from abc import ABC, ABCMeta, abstractmethod
+from typing import Union, List, Dict
 import json
 
 
@@ -19,7 +20,7 @@ class BaseModel(ABC, metaclass=ABCMeta):
     """
 
     @staticmethod
-    def remove_none_item(base: dict) -> dict:
+    def remove_none_item(base: Dict) -> Dict:
         """딕셔너리의 key-value 쌍 중 value가 None인 쌍을 제거합니다.
 
         카카오톡 서버로 반환 시 None인 값을 제외하고 반환하기 위해 사용합니다.
@@ -45,7 +46,7 @@ class BaseModel(ABC, metaclass=ABCMeta):
         return out
 
     @abstractmethod
-    def render(self) -> dict | list:
+    def render(self) -> Union[Dict, List]:
         """객체를 카카오톡 응답 형식에 알맞게 dict로 변환합니다.
 
         변환된 dict는 각 객체가 타깃으로 하는 카카오톡 응답 형식의 상세 필드를 key로 가집니다.
@@ -93,7 +94,7 @@ class ParentPayload(ABC, metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: Dict):
         """딕셔너리를 받아서 객체로 변환하는 메서드입니다.
 
         Args:
