@@ -1,0 +1,35 @@
+name: Validate PR Labels
+
+on:
+  pull_request:
+    types: 
+      - labeled
+
+jobs:
+  validate-labels:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Check for version bump labels
+      id: validate_labels
+      run: |
+        JSON_LABELS="${{ toJson(github.event.pull_request.labels) }}"
+        echo "JSON_LABELS: $JSON_LABELS"
+
+        if echo "$JSON_LABELS" | jq -e '.[] | select(.name == "major")' >/dev/null; then
+          echo "type=major"
+        elif echo "$JSON_LABELS" | jq -e '.[] | select(.name == "minor")' >/dev/null; then
+          echo "type=minor"
+        elif echo "$JSON_LABELS" | jq -e '.[] | select(.name == "patch")' >/dev/null; then
+          echo "type=patch"
+        else
+          echo "Error: No valid version bump label found."
+          exit 1
+        fi
+
+    - name: Fail if labels are invalid
+      if: failure()
+      run: echo "This PR must have a valid version bump label (major, minor, patch)."
